@@ -1,0 +1,32 @@
+package com.example.restclientpocproductpricesservice.domain;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+
+@Entity
+@Table(name = "price")
+@Builder(toBuilder = true)
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+public class ProductPrice {
+    @Id
+    private Long id;
+
+    @Column(nullable = false, precision = 12, scale = 2)
+    private BigDecimal amount;
+
+    @Column(nullable = false, length = 8)
+    private String currency;
+
+    @Column(name = "price_type", nullable = false, length = 16)
+    private String priceType;
+}
