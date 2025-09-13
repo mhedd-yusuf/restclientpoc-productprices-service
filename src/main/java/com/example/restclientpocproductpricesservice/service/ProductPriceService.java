@@ -1,5 +1,6 @@
 package com.example.restclientpocproductpricesservice.service;
 
+import com.example.restclientpocproductpricesservice.api.request.PriceRequest;
 import com.example.restclientpocproductpricesservice.api.response.PriceResponse;
 import com.example.restclientpocproductpricesservice.common.PageableSanitizer;
 import com.example.restclientpocproductpricesservice.domain.ProductPrice;
@@ -11,7 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +26,7 @@ public class ProductPriceService {
 //        return productPriceRepository.findAll()
 //                .stream()
 //                .map(toPriceResponse)
-//                .collect(Collectors.toList());
+//                .toList();
 //    }
 
     public List<PriceResponse> getPrices(final Pageable pageable) {
@@ -36,4 +37,26 @@ public class ProductPriceService {
                 .map(toPriceResponse)
                 .toList();
     }
+
+    public PriceResponse getPrice(final Long id) {
+        return productPriceRepository.findById(id)
+                .map(toPriceResponse)
+                .orElseThrow(() -> new NoSuchElementException("Product with Id: " + id + " Not found"));
+    }
+
+    public PriceResponse createPrice(final PriceRequest priceRequest) {
+
+        if (productPriceRepository.existsById(priceRequest.getId())) {
+            throw new IllegalArgumentException("Price with id " + priceRequest.getId() + " already exists");
+        }
+        ProductPrice saved = productPriceRepository.save(ProductPrice
+                .builder()
+                .id(priceRequest.getId())
+                .amount(priceRequest.getAmount())
+                .priceType(priceRequest.getPriceType())
+                .currency(priceRequest.getCurrency())
+                .build());
+        return toPriceResponse.apply(saved);
+    }
+
 }
