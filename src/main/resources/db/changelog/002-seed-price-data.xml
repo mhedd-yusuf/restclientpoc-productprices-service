@@ -14,14 +14,5 @@
                 encoding="UTF-8"
                 quotchar="&quot;"/>
     </changeSet>
-<!--    <changeSet id="002-seed-price-data" author="you">-->
-<!--        <loadData-->
-<!--                tableName="price"-->
-<!--                file="../data/price.csv"-->
-<!--                relativeToChangelogFile="true"-->
-<!--                separator=","-->
-<!--                encoding="UTF-8"-->
-<!--                quotchar="&quot;"/>-->
-<!--    </changeSet>-->
 
 </databaseChangeLog>

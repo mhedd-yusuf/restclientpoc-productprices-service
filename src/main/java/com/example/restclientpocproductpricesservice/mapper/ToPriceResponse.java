@@ -14,6 +14,7 @@ public class ToPriceResponse implements Function<ProductPrice, PriceResponse> {
         return PriceResponse
                 .builder()
                 .id(productPrice.getId())
+                .amount(productPrice.getAmount())
                 .priceType(productPrice.getPriceType())
                 .currency(productPrice.getCurrency())
                 .build();
