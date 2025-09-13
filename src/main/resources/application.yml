@@ -26,3 +26,10 @@ server:
 #logging:
 #  level:
 #    liquibase: info #debug
+
+pagination:
+  default-size: 30
+  max-size: 70
+  clamp-to-last: false
+  max-offset: 0
+  allowed-sort: id
