@@ -4,32 +4,28 @@ import com.example.restclientpocproductpricesservice.api.request.PriceRequest;
 import com.example.restclientpocproductpricesservice.api.response.PriceResponse;
 import com.example.restclientpocproductpricesservice.common.PageableSanitizer;
 import com.example.restclientpocproductpricesservice.domain.ProductPrice;
+import com.example.restclientpocproductpricesservice.exception.NotFoundException;
 import com.example.restclientpocproductpricesservice.mapper.ToPriceResponse;
 import com.example.restclientpocproductpricesservice.repository.ProductPriceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProductPriceService {
 
     private final ProductPriceRepository productPriceRepository;
     private final ToPriceResponse toPriceResponse;
     private final PageableSanitizer pageableSanitizer;
 
-//    public List<PriceResponse> getPrices() {
-//        return productPriceRepository.findAll()
-//                .stream()
-//                .map(toPriceResponse)
-//                .toList();
-//    }
 
-    public List<PriceResponse> getPrices(final Pageable pageable) {
+    public List<PriceResponse> listPrices(final Pageable pageable) {
         Pageable sanitizedPage = pageableSanitizer.apply(pageable);
         Page<ProductPrice> productPrices = productPriceRepository.findAll(sanitizedPage);
         return productPrices
@@ -38,24 +34,21 @@ public class ProductPriceService {
                 .toList();
     }
 
-    public PriceResponse getPrice(final Long id) {
+    public PriceResponse findPrice(final Long id) {
         return productPriceRepository.findById(id)
                 .map(toPriceResponse)
-                .orElseThrow(() -> new NoSuchElementException("Product with Id: " + id + " Not found"));
+                .orElseThrow(() -> new NotFoundException("Price with id " + id + " not found"));
     }
 
+    @Transactional
     public PriceResponse createPrice(final PriceRequest priceRequest) {
-
-        if (productPriceRepository.existsById(priceRequest.getId())) {
-            throw new IllegalArgumentException("Price with id " + priceRequest.getId() + " already exists");
-        }
-        ProductPrice saved = productPriceRepository.save(ProductPrice
+        ProductPrice productPrice = ProductPrice
                 .builder()
-                .id(priceRequest.getId())
                 .amount(priceRequest.getAmount())
                 .priceType(priceRequest.getPriceType())
                 .currency(priceRequest.getCurrency())
-                .build());
+                .build();
+        ProductPrice saved = productPriceRepository.save(productPrice);
         return toPriceResponse.apply(saved);
     }
 

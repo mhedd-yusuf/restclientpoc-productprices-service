@@ -21,20 +21,12 @@ import java.util.List;
 public class ProductPriceController {
     private final ProductPriceService productPriceService;
 
-    //    @GetMapping
-//    public ResponseEntity<ApiResponse<List<PriceResponse>>> getPrices() {
-//        return ResponseEntity.ok(
-//                ApiResponse.<List<PriceResponse>>builder()
-//                        .data(productPriceService.getPrices())
-//                        .build()
-//        );
-//    }
     @GetMapping
     public ResponseEntity<ApiResponse<List<PriceResponse>>> getPrices(@PageableDefault(
             direction = Sort.Direction.ASC) Pageable pageable) {
         return ResponseEntity.ok(
                 ApiResponse.<List<PriceResponse>>builder()
-                        .data(productPriceService.getPrices(pageable))
+                        .data(productPriceService.listPrices(pageable))
                         .build()
         );
     }
@@ -43,16 +35,17 @@ public class ProductPriceController {
     public ResponseEntity<ApiResponse<PriceResponse>> getPrice(@PathVariable Long id) {
         return ResponseEntity.ok(
                 ApiResponse.<PriceResponse>builder()
-                        .data(productPriceService.getPrice(id))
+                        .data(productPriceService.findPrice(id))
                         .build()
         );
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse<PriceResponse>> createPrice(@Valid @RequestBody PriceRequest priceRequest) {
-        return ResponseEntity.created(URI.create("/prices/" + priceRequest.getId()))
+        PriceResponse priceResponse = productPriceService.createPrice(priceRequest);
+        return ResponseEntity.created(URI.create("/prices/" + priceResponse.getId()))
                 .body(ApiResponse.<PriceResponse>builder()
-                        .data(productPriceService.createPrice(priceRequest))
+                        .data(priceResponse)
                         .build());
     }
 
